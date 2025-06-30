@@ -16,13 +16,15 @@ const Contents = ({}) => {
 
   useEffect(() => {
     setitems((items) => {
-      console.log("[...items, content.slice(page * 6, 6 * page + 6)] : ", [
-        ...items,
-        ...content.slice(page * 6, 6 * page + 6),
-      ]);
-      return [...items, ...content.slice(page * 6, 6 * page + 6)];
+      return [...items, ...content.slice(page * 8, 8 * page + 8)];
     });
-  }, [page, content]);
+  }, [page]);
+
+  useEffect(() => {
+    setitems((items) => {
+      return [...content.slice(page * 8, 8 * page + 8)];
+    });
+  }, [content]);
 
   const handleLoadMoreData = () => {
     setPage((prevPage) => prevPage + 1);

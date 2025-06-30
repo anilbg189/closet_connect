@@ -20,13 +20,6 @@ const Home = () => {
   }, [searchParams]);
 
   const filterContents = (data) => {
-    console.log("filterContents data", data);
-    console.log(
-      searchParams.get("paid"),
-      searchParams.get("free"),
-      searchParams.get("view_only")
-    );
-
     let filteredContent = [...data];
 
     if (
@@ -43,6 +36,8 @@ const Home = () => {
       });
     }
 
+    console.log("searchParams.get(search) : ", searchParams.get("search"));
+
     if (searchParams.get("search")) {
       filteredContent = filteredContent.filter((item) => {
         return (
@@ -56,6 +51,7 @@ const Home = () => {
       });
     }
 
+    console.log("filteredContent : ", filteredContent);
     dispatch(setFilteredContent(filteredContent));
     return filteredContent;
   };
