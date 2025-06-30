@@ -1,0 +1,49 @@
+.home {
+  padding: 25px;
+
+  .keyword-search {
+    background-color: #1a1a1f13;
+  }
+
+  .MuiInputBase-input .MuiOutlinedInput-input {
+    background-color: black;
+  }
+
+  .contents {
+    padding-top: 20px;
+
+    .content-pic {
+      height: 300px;
+      border-radius: 8px;
+      width: 100%;
+      object-fit: cover;
+      object-position: 50% 0%;
+    }
+
+    .creator-title-price {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+
+      .creator-title {
+        text-align: left;
+
+        .creator {
+          color: #777783;
+          font-size: 14px;
+        }
+        .title {
+          color: white;
+          font-size: 14px;
+        }
+      }
+
+      .price {
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+      }
+    }
+  }
+}
