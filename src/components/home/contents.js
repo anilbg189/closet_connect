@@ -37,9 +37,10 @@ const Contents = ({}) => {
   }, [content]);
 
   const handleLoadMoreData = () => {
-    setTimeout(() => {
-      setPage((prevPage) => prevPage + 1);
-    }, 2000);
+    // set settimeout to see loading UI skeleton
+    // setTimeout(() => {
+    setPage((prevPage) => prevPage + 1);
+    // }, 2000);
   };
 
   return (
