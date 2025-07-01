@@ -1,4 +1,5 @@
 import { createTheme } from "@mui/material/styles";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const theme = createTheme({
   breakpoints: {
@@ -16,6 +17,55 @@ const theme = createTheme({
     },
   },
   components: {
+    MuiInput: {
+      styleOverrides: {
+        root: {
+          color: "white",
+          "&:before": {
+            borderBottom: "1px solid white", // default underline
+          },
+          "&:hover:not(.Mui-disabled):before": {
+            borderBottom: "2px solid white", // hover underline
+          },
+          "&:after": {
+            borderBottom: "2px solid white", // active/focus underline
+          },
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: "white",
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          color: "white",
+          "& .MuiOutlinedInput-notchedOutline": {
+            // borderColor: "white",
+          },
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "white",
+          },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "white",
+          },
+        },
+      },
+    },
+    MuiSelect: {
+      defaultProps: {
+        IconComponent: ExpandMoreIcon, // use white arrow icon
+      },
+      styleOverrides: {
+        icon: {
+          color: "white",
+        },
+      },
+    },
     MuiTextField: {
       defaultProps: {
         variant: "outlined",

@@ -1,23 +1,80 @@
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import ContentFilter from "../components/home/contentFilter";
+import Sort from "../components/home/sort";
 import Contents from "../components/home/contents";
 import { useSearchParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setInitialContent, setFilteredContent } from "../redux/contentSlice";
+import { getApiContents } from "../apis/content";
 
 const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setsearch] = useState(searchParams.get("search" || ""));
-  const [content, setcontent] = useState([]);
   const dispatch = useDispatch();
   const initialContent = useSelector((state) => state.content.initial);
+  const filteredContent = useSelector((state) => state.content.filtered);
+  const [sort, setsort] = useState("name");
+  const [loading, setloading] = useState(true);
+  const [priceRange, setPriceChange] = useState([0, 999]);
+
+  const sortFilteredContents = (data) => {
+    let sortedContents = [...data];
+
+    switch (sort) {
+      case "name":
+        sortedContents = sortedContents.sort((a, b) =>
+          a.title.toLowerCase().localeCompare(b.title.toLowerCase())
+        );
+        break;
+
+      case "higher_price":
+        let paid1 = sortedContents
+          .filter((item) => !item.pricingOption)
+          .sort((a, b) => b.price - a.price);
+        let nonpaid1 = sortedContents.filter((item) => item.pricingOption);
+        sortedContents = [...paid1, ...nonpaid1];
+        break;
+
+      case "lower_price":
+        let paid2 = sortedContents
+          .filter((item) => !item.pricingOption)
+          .sort((a, b) => a.price - b.price);
+        let nonpaid2 = sortedContents.filter((item) => item.pricingOption);
+        sortedContents = [...paid2, ...nonpaid2];
+        break;
+
+      default:
+        break;
+    }
+
+    return sortedContents;
+  };
+
+  const handleSort = (e) => {
+    setsort(e.target.value);
+    let data = [...sortFilteredContents(filteredContent)];
+    dispatch(setFilteredContent(data));
+  };
 
   useEffect(() => {
-    filterContents(initialContent);
-  }, [searchParams]);
+    if (initialContent.length) {
+      setloading(true);
+      let data = filterContents(initialContent);
+      data = sortFilteredContents(data);
+      dispatch(setFilteredContent(data));
+      setloading(false);
+    }
+  }, [searchParams, priceRange]);
+
+  useEffect(() => {
+    if (filteredContent.length) {
+      let data = [...sortFilteredContents(filteredContent)];
+      dispatch(setFilteredContent(data));
+    }
+  }, [sort]);
 
   const filterContents = (data) => {
     let filteredContent = [...data];
@@ -36,8 +93,6 @@ const Home = () => {
       });
     }
 
-    console.log("searchParams.get(search) : ", searchParams.get("search"));
-
     if (searchParams.get("search")) {
       filteredContent = filteredContent.filter((item) => {
         return (
@@ -51,25 +106,26 @@ const Home = () => {
       });
     }
 
-    console.log("filteredContent : ", filteredContent);
-    dispatch(setFilteredContent(filteredContent));
+    if (searchParams.get("paid")) {
+      filteredContent = filteredContent.filter(
+        (item) =>
+          item.pricingOption != 0 ||
+          (item.price >= priceRange[0] && item.price <= priceRange[1])
+      );
+    }
+
     return filteredContent;
   };
 
   const getContents = async () => {
     try {
-      const response = await fetch(
-        "https://closet-recruiting-api.azurewebsites.net/api/data"
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
+      const result = await getApiContents();
       dispatch(setInitialContent(result));
-
-      const filtered = filterContents(result);
+      let data = filterContents(result);
+      data = sortFilteredContents(data);
+      dispatch(setFilteredContent(data));
+      setloading(false);
     } catch (err) {
-      // setError(err);
       console.log("error : ", err);
     }
   };
@@ -104,8 +160,9 @@ const Home = () => {
           ),
         }}
       />
-      <ContentFilter filterContents={filterContents} />
-      <Contents />
+      <ContentFilter priceRange={priceRange} setPriceChange={setPriceChange} />
+      <Sort sort={sort} handleSort={handleSort} />
+      {loading ? "loading..." : <Contents />}
     </div>
   );
 };

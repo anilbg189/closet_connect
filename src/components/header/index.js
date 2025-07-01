@@ -1,5 +1,5 @@
 import React from "react";
-import Logo from "../images/connect-desktop-header-bi.svg";
+import Logo from "../../images/connect-desktop-header-bi.svg";
 
 export const Header = () => {
   return (

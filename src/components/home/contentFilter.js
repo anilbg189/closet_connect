@@ -1,15 +1,16 @@
-import React from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import { Typography } from "@mui/material";
 import { useSearchParams } from "react-router";
-import { useSelector } from "react-redux";
+import Slider from "@mui/material/Slider";
 
-const ContentFilter = () => {
+const minDistance = 0;
+
+const ContentFilter = ({ priceRange, setPriceChange }) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialContent = useSelector((state) => state.content.initial);
 
   // // To set a single parameter:
   // const handleSetParam = () => {
@@ -35,20 +36,26 @@ const ContentFilter = () => {
 
   const resetFilter = () => {
     const newParams = new URLSearchParams(searchParams);
+    setPriceChange([0, 999]);
     newParams.delete("paid");
     newParams.delete("free");
     newParams.delete("view_only");
     setSearchParams(newParams);
   };
 
-  // To delete a parameter:
-  // const handleDeleteParam = () => {
-  //   const newParams = new URLSearchParams(searchParams);
-  //   newParams.delete("paramToDelete");
-  //   setSearchParams(newParams);
-  // };
-
-  // console.log("free params : ", searchParams.get("free"));
+  const handlePriceRange = (event, newValue, activeThumb) => {
+    if (activeThumb === 0) {
+      setPriceChange([
+        Math.min(newValue[0], priceRange[1] - minDistance),
+        priceRange[1],
+      ]);
+    } else {
+      setPriceChange([
+        priceRange[0],
+        Math.max(newValue[1], priceRange[0] + minDistance),
+      ]);
+    }
+  };
 
   return (
     <div className="content-filter">
@@ -61,15 +68,27 @@ const ContentFilter = () => {
           display: "flex",
           alignContent: "center",
           justifyContent: "space-between",
+          flexDirection: { md: "row", xs: "column" },
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flexDirection: { md: "row", xs: "column" },
+          }}
+        >
           <Typography
-            sx={{ paddingRight: "24px", color: "#777783", fontSize: "14px" }}
+            sx={{
+              color: "#777783",
+              fontSize: "14px",
+              p: { xs: 1, md: 0 },
+              pr: { xs: 0, md: "24px" },
+            }}
           >
             Pricing Option
           </Typography>
-          <FormGroup row={true}>
+          <FormGroup row={true} sx={{ width: { xs: "100%", md: "auto" } }}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -86,6 +105,8 @@ const ContentFilter = () => {
                 "& .MuiFormControlLabel-label": {
                   fontSize: "14px",
                 },
+                flex: { xs: 1, md: "auto" },
+                justifyContent: { xs: "center", md: "auto" },
               }}
             />
             <FormControlLabel
@@ -104,6 +125,8 @@ const ContentFilter = () => {
                 "& .MuiFormControlLabel-label": {
                   fontSize: "14px",
                 },
+                flex: { xs: 1, md: "auto" },
+                justifyContent: { xs: "center", md: "auto" },
               }}
             />
             <FormControlLabel
@@ -122,9 +145,43 @@ const ContentFilter = () => {
                 "& .MuiFormControlLabel-label": {
                   fontSize: "14px",
                 },
+                flex: { xs: 1, md: "auto" },
+                justifyContent: { xs: "center", md: "auto" },
               }}
             />
           </FormGroup>
+          <Box
+            sx={{
+              display: "flex",
+              color: searchParams.get("paid") == "true" ? "white" : "grey",
+              alignItems: "center",
+              pl: { xs: 0, md: 3 },
+              pt: { xs: 2, md: 0 },
+              pb: { xs: 2, md: 0 },
+            }}
+          >
+            <Typography sx={{ fontSize: "14px" }}>${priceRange[0]}</Typography>
+            <Box
+              sx={{
+                width: 150,
+                display: "flex",
+                alignItems: "center",
+                padding: "0 20px",
+              }}
+            >
+              <Slider
+                value={priceRange}
+                onChange={handlePriceRange}
+                valueLabelDisplay="auto"
+                size="small"
+                disabled={searchParams.get("paid") != "true"}
+                min={0}
+                max={999}
+                disableSwap
+              />
+            </Box>
+            <Typography sx={{ fontSize: "14px" }}>${priceRange[1]}</Typography>
+          </Box>
         </Box>
         <Typography
           onClick={resetFilter}
@@ -135,6 +192,7 @@ const ContentFilter = () => {
             alignItems: "center",
             fontWeight: "bold",
             cursor: "pointer",
+            justifyContent: { xs: "center", md: "flex-end" },
           }}
         >
           RESET
